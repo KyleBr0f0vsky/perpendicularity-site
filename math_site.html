@@ -1,0 +1,910 @@
+<!-- ... existing code ... -->
+<!DOCTYPE html>
+<html lang="uk" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Стереометрія: Перпендикулярність у просторі</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #111827;
+            font-family: 'Inter', sans-serif;
+            background-image: linear-gradient(to bottom, #f3f4f6 1px, transparent 1px);
+            background-size: 100% 28px;
+        }
+        .notebook-card {
+            background: #ffffff;
+            border: 1.5px solid #111827;
+            box-shadow: 4px 4px 0px #111827;
+        }
+        .notebook-btn {
+            background: #ffffff;
+            border: 1.5px solid #111827;
+            box-shadow: 2px 2px 0px #111827;
+            transition: all 0.1s ease;
+        }
+        .notebook-btn:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px #111827;
+        }
+        .notebook-btn:active {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px #111827;
+        }
+        .notebook-input {
+            border: 1.5px solid #111827;
+            background: #ffffff;
+        }
+        .math-code {
+            font-family: 'JetBrains Mono', monospace;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.9em;
+        }
+        .tab-section {
+            display: none;
+        }
+        .tab-section.active {
+            display: block;
+        }
+        #canvas-container {
+            width: 100%;
+            height: 420px;
+            background: #fafafa;
+            border: 1.5px solid #111827;
+            position: relative;
+            cursor: grab;
+        }
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+        .vertex-label {
+            position: absolute;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 12px;
+            color: #111827;
+            background: #ffffff;
+            border: 1px solid #111827;
+            padding: 1px 4px;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+    <!-- Шапка сайту (Блокнотний стиль) -->
+    <header class="sticky top-0 z-50 bg-white border-b-2 border-slate-900 py-3 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 cursor-pointer" onclick="switchTab('theory')">
+                <div class="w-8 h-8 border-2 border-slate-900 bg-slate-900 text-white font-mono font-bold flex items-center justify-center text-sm shadow-[2px_2px_0px_#111827]">
+                    ⊥
+                </div>
+                <h1 class="font-bold text-base sm:text-lg tracking-tight text-slate-900">
+                    Стереометрія: Перпендикулярність у просторі
+                </h1>
+            </div>
+
+            <!-- Навігаційне меню -->
+            <nav class="flex flex-wrap items-center gap-1.5" id="nav-menu">
+                <button onclick="switchTab('theory')" data-tab="theory" class="notebook-btn px-3 py-1.5 rounded-none text-xs font-semibold bg-slate-900 text-white">
+                    Теорія
+                </button>
+                <button onclick="switchTab('lab3d')" data-tab="lab3d" class="notebook-btn px-3 py-1.5 rounded-none text-xs font-semibold text-slate-900">
+                    3D-модель
+                </button>
+                <button onclick="switchTab('examples')" data-tab="examples" class="notebook-btn px-3 py-1.5 rounded-none text-xs font-semibold text-slate-900">
+                    Приклади (5)
+                </button>
+                <button onclick="switchTab('practice')" data-tab="practice" class="notebook-btn px-3 py-1.5 rounded-none text-xs font-semibold text-slate-900">
+                    Практика (5)
+                </button>
+                <button onclick="switchTab('applications')" data-tab="applications" class="notebook-btn px-3 py-1.5 rounded-none text-xs font-semibold text-slate-900">
+                    Застосування
+                </button>
+                <button onclick="switchTab('quiz')" data-tab="quiz" class="notebook-btn px-3 py-1.5 rounded-none text-xs font-semibold text-slate-900">
+                    Тест (10)
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Основний контент -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-6 space-y-8">
+
+        <!-- ================================================================= -->
+        <!-- 1. ТЕОРІЯ                                                         -->
+        <!-- ================================================================= -->
+        <section id="tab-theory" class="tab-section active space-y-6">
+            <div class="notebook-card p-6 bg-white space-y-4">
+                <div class="border-b-2 border-slate-900 pb-2">
+                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">Розділ I</span>
+                    <h2 class="text-xl font-bold text-slate-900">Теоретичний конспект</h2>
+                </div>
+                <p class="text-slate-700 text-sm leading-relaxed">
+                    У стереометрії перпендикулярність охоплює не лише прямі на площині, а й взаємне розташування прямих, площин та похилих у тривимірному просторі. Нижче наведено основні поняття простостими словами.
+                </p>
+
+                <!-- Картки ознак -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div class="border-1.5 border-slate-900 p-4 bg-slate-50 space-y-2">
+                        <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between">
+                            <span>1. Пряма і площина (⊥)</span>
+                            <span class="font-mono text-xs">a ⊥ α</span>
+                        </h3>
+                        <p class="text-xs text-slate-700 leading-relaxed">
+                            Пряма називається перпендикулярною до площини, якщо вона перпендикулярна до <strong>двох прямих, що перетинаються</strong> у цій площині.
+                        </p>
+                    </div>
+
+                    <div class="border-1.5 border-slate-900 p-4 bg-slate-50 space-y-2">
+                        <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between">
+                            <span>2. Перпендикулярні площини</span>
+                            <span class="font-mono text-xs">α ⊥ β</span>
+                        </h3>
+                        <p class="text-xs text-slate-700 leading-relaxed">
+                            Дві площини перпендикулярні, якщо кут між ними дорівнює 90°. Ознака: якщо одна площина містить пряму, перпендикулярну до другої площини, то вони перпендикулярні.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Теорема про три перпендикуляри -->
+                <div class="border-1.5 border-slate-900 p-5 bg-white space-y-3">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 bg-slate-900 text-white font-mono text-xs font-bold">Важливо</span>
+                        <h3 class="font-bold text-slate-900 text-sm">Теорема про три перпендикуляри (ТПТП)</h3>
+                    </div>
+                    <p class="text-xs text-slate-700 leading-relaxed">
+                        Пряма, проведена на площині через основу похилої, перпендикулярна до її <strong>проєкції</strong> на цю площину тоді і тільки тоді, коли вона перпендикулярна до самої <strong>похилої</strong>.
+                    </p>
+                    <div class="font-mono text-xs bg-slate-100 p-2 border border-slate-300">
+                        AB ⊥ α, AC — похила, BC — проєкція, a ⊂ α &nbsp;⇒&nbsp; (a ⊥ BC ⇔ a ⊥ AC)
+                    </div>
+                </div>
+
+                <!-- Зведена таблиця -->
+                <div class="overflow-x-auto pt-2">
+                    <h3 class="font-bold text-slate-900 text-sm mb-3">Зведена таблиця ознак</h3>
+                    <table class="w-full text-left border-collapse text-xs border border-slate-900">
+                        <thead>
+                            <tr class="bg-slate-900 text-white">
+                                <th class="py-2 px-3 border border-slate-900">Елементи</th>
+                                <th class="py-2 px-3 border border-slate-900">Позначення</th>
+                                <th class="py-2 px-3 border border-slate-900">Умова перпендикулярності</th>
+                                <th class="py-2 px-3 border border-slate-900">Кут</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-300 text-slate-800">
+                            <tr>
+                                <td class="py-2 px-3 border border-slate-300 font-medium">Прямі у просторі</td>
+                                <td class="py-2 px-3 border border-slate-300 font-mono">a ⊥ b</td>
+                                <td class="py-2 px-3 border border-slate-300">Кут між ними дорівнює 90° (зокрема для мимобіжних)</td>
+                                <td class="py-2 px-3 border border-slate-300 font-mono">90°</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-3 border border-slate-300 font-medium">Пряма і площина</td>
+                                <td class="py-2 px-3 border border-slate-300 font-mono">a ⊥ α</td>
+                                <td class="py-2 px-3 border border-slate-300">Перпендикулярна до двох прямих, що перетинаються у площині</td>
+                                <td class="py-2 px-3 border border-slate-300 font-mono">90°</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-3 border border-slate-300 font-medium">Площини</td>
+                                <td class="py-2 px-3 border border-slate-300 font-mono">α ⊥ β</td>
+                                <td class="py-2 px-3 border border-slate-300">Одна площина проходить через пряму, ⊥ до другої</td>
+                                <td class="py-2 px-3 border border-slate-300 font-mono">90°</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- 2. 3D-МОДЕЛЬ (THREE.JS)                                           -->
+        <!-- ================================================================= -->
+        <section id="tab-lab3d" class="tab-section space-y-6">
+            <div class="notebook-card p-6 bg-white space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-slate-900 pb-2">
+                    <div>
+                        <span class="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">Розділ II</span>
+                        <h2 class="text-xl font-bold text-slate-900">Інтерактивна 3D-лабораторія</h2>
+                    </div>
+                    <!-- Вибір фігури -->
+                    <div class="flex flex-wrap gap-1.5" id="shape-selector">
+                        <button onclick="selectShape('cube')" data-shape="cube" class="notebook-btn px-3 py-1 text-xs font-semibold bg-slate-900 text-white">Куб</button>
+                        <button onclick="selectShape('parallelepiped')" data-shape="parallelepiped" class="notebook-btn px-3 py-1 text-xs font-semibold text-slate-900">Паралелепіпед</button>
+                        <button onclick="selectShape('pyramid')" data-shape="pyramid" class="notebook-btn px-3 py-1 text-xs font-semibold text-slate-900">Піраміда</button>
+                    </div>
+                </div>
+
+                <p class="text-xs text-slate-600">
+                    Обертайте фігуру мишею. Оберіть базовий елемент та натисніть на інший елемент або виберіть зі списку, щоб перевірити їхню перпендикулярність.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                    <!-- Canvas -->
+                    <div class="lg:col-span-7">
+                        <div id="canvas-container">
+                            <div id="labels-layer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+                        </div>
+                    </div>
+
+                    <!-- Панель керування та висновку -->
+                    <div class="lg:col-span-5 flex flex-col justify-between space-y-3">
+                        <div class="border-1.5 border-slate-900 p-4 bg-slate-50 space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Базовий елемент:</label>
+                                <select id="base-element-select" onchange="onBaseElementChange()" class="notebook-input w-full p-2 text-xs text-slate-900 focus:outline-none">
+                                </select>
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-xs font-bold uppercase text-slate-700">Перевірити елемент:</label>
+                                    <button onclick="highlightAllPerpendiculars()" class="text-xs font-semibold underline text-slate-900">Показати всі ⊥</button>
+                                </div>
+                                <select id="target-element-select" onchange="onTargetElementChange()" class="notebook-input w-full p-2 text-xs text-slate-900 focus:outline-none">
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Пояснення -->
+                        <div class="flex-grow border-1.5 border-slate-900 p-4 bg-white space-y-2">
+                            <div class="flex items-center gap-2">
+                                <span id="verdict-badge" class="px-2 py-0.5 text-xs font-bold font-mono bg-slate-900 text-white">Дослідження</span>
+                                <h4 id="verdict-title" class="font-bold text-slate-900 text-xs">Оберіть елементи</h4>
+                            </div>
+                            <p id="verdict-explanation" class="text-xs text-slate-700 leading-relaxed">
+                                Клікніть по будь-якому ребру у 3D-сцені або скористайтеся випадаючими списками вище.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- 3. РОЗІБРАНІ ПРИКЛАДИ (5 ЗАДАЧ)                                    -->
+        <!-- ================================================================= -->
+        <section id="tab-examples" class="tab-section space-y-6">
+            <div class="notebook-card p-6 bg-white space-y-6">
+                <div class="border-b-2 border-slate-900 pb-2">
+                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">Розділ III</span>
+                    <h2 class="text-xl font-bold text-slate-900">Розібрані приклади (5 задач)</h2>
+                </div>
+
+                <div class="space-y-4 text-xs sm:text-sm">
+                    <!-- Задача 1 -->
+                    <div class="border-1.5 border-slate-900 p-4 space-y-2 bg-slate-50">
+                        <div class="font-bold text-slate-900">Задача 1. Похила та перпендикуляр</div>
+                        <p class="text-slate-700"><strong>Умова:</strong> З точки поза площиною проведено перпендикуляр 12 см і похилу 13 см. Знайти проєкцію похилої.</p>
+                        <div class="bg-white p-3 border border-slate-300 space-y-1 font-mono text-slate-800">
+                            <div>Дано: h = 12 см, l = 13 см. Знайти: p.</div>
+                            <div>Розв'язання: p = √(l² − h²) = √(13² − 12²) = √(169 − 144) = √25 = 5 (см).</div>
+                            <div class="text-slate-900 font-bold">Відповідь: 5 см.</div>
+                        </div>
+                    </div>
+
+                    <!-- Задача 2 -->
+                    <div class="border-1.5 border-slate-900 p-4 space-y-2 bg-slate-50">
+                        <div class="font-bold text-slate-900">Задача 2. Кут між похилою та площиною</div>
+                        <p class="text-slate-700"><strong>Умова:</strong> Похила завдовжки 16 см утворює з площиною кут 30°. Знайти довжину перпендикуляра.</p>
+                        <div class="bg-white p-3 border border-slate-300 space-y-1 font-mono text-slate-800">
+                            <div>Дано: l = 16 см, φ = 30°. Знайти: h.</div>
+                            <div>Розв'язання: h = l · sin(30°) = 16 · 0.5 = 8 (см).</div>
+                            <div class="text-slate-900 font-bold">Відповідь: 8 см.</div>
+                        </div>
+                    </div>
+
+                    <!-- Задача 3 -->
+                    <div class="border-1.5 border-slate-900 p-4 space-y-2 bg-slate-50">
+                        <div class="font-bold text-slate-900">Задача 3. Діагональ прямокутного паралелепіпеда</div>
+                        <p class="text-slate-700"><strong>Умова:</strong> Виміри прямокутного паралелепіпеда дорівнюють 2 см, 3 см і 6 см. Знайти його діагональ.</p>
+                        <div class="bg-white p-3 border border-slate-300 space-y-1 font-mono text-slate-800">
+                            <div>Дано: a = 2, b = 3, c = 6. Знайти: d.</div>
+                            <div>Розв'язання: d = √(a² + b² + c²) = √(4 + 9 + 36) = √49 = 7 (см).</div>
+                            <div class="text-slate-900 font-bold">Відповідь: 7 см.</div>
+                        </div>
+                    </div>
+
+                    <!-- Задача 4 -->
+                    <div class="border-1.5 border-slate-900 p-4 space-y-2 bg-slate-50">
+                        <div class="font-bold text-slate-900">Задача 4. Теорема про три перпендикуляри</div>
+                        <p class="text-slate-700"><strong>Умова:</strong> Точка S віддалена від площини квадрата ABCD на 12 см і проєктується у вершину A. Сторона квадрата 9 см. Знайти відстань від S до CD.</p>
+                        <div class="bg-white p-3 border border-slate-300 space-y-1 font-mono text-slate-800">
+                            <div>Дано: SA = 12, AD = 9, AD ⊥ CD. Знайти: SD.</div>
+                            <div>Розв'язання: За ТПТП SD ⊥ CD. Із △SAD: SD = √(12² + 9²) = 15 (см).</div>
+                            <div class="text-slate-900 font-bold">Відповідь: 15 см.</div>
+                        </div>
+                    </div>
+
+                    <!-- Задача 5 -->
+                    <div class="border-1.5 border-slate-900 p-4 space-y-2 bg-slate-50">
+                        <div class="font-bold text-slate-900">Задача 5. Площа ортогональної проєкції</div>
+                        <p class="text-slate-700"><strong>Умова:</strong> Площа трикутника дорівнює 24 см². Його проєкція утворює з площиною трикутника кут 60°. Знайти площу проєкції.</p>
+                        <div class="bg-white p-3 border border-slate-300 space-y-1 font-mono text-slate-800">
+                            <div>Дано: S = 24, φ = 60°. Знайти: S_пр.</div>
+                            <div>Розв'язання: S_пр = S · cos(60°) = 24 · 0.5 = 12 (см²).</div>
+                            <div class="text-slate-900 font-bold">Відповідь: 12 см².</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- 4. ПРАКТИКА (5 САМОСТІЙНИХ ЗАВДАНЬ)                                 -->
+        <!-- ================================================================= -->
+        <section id="tab-practice" class="tab-section space-y-6">
+            <div class="notebook-card p-6 bg-white space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-slate-900 pb-2">
+                    <div>
+                        <span class="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">Розділ IV</span>
+                        <h2 class="text-xl font-bold text-slate-900">Практикум (Самостійні завдання)</h2>
+                    </div>
+                    <div class="text-xs font-mono font-bold bg-slate-900 text-white px-3 py-1">
+                        Виконано: <span id="practice-score">0</span> / 5
+                    </div>
+                </div>
+
+                <div class="space-y-4" id="practice-list">
+                    <!-- Динамічно з JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- 5. ПРАКТИЧНЕ ЗАСТУСУВАННЯ                                         -->
+        <!-- ================================================================= -->
+        <section id="tab-applications" class="tab-section space-y-6">
+            <div class="notebook-card p-6 bg-white space-y-6">
+                <div class="border-b-2 border-slate-900 pb-2">
+                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">Розділ V</span>
+                    <h2 class="text-xl font-bold text-slate-900">Практичне застосування</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+                    <div class="border-1.5 border-slate-900 p-4 space-y-2 bg-slate-50">
+                        <h3 class="font-bold text-slate-900">1. Будівництво та архітектура</h3>
+                        <p class="text-slate-700 leading-relaxed">
+                            Висок (тягарець на нитці) є природним перпендикуляром до горизонтальної площини землі. За його допомогою будівельники перевіряють вертикальність несучих стін і колон хмарочосів.
+                        </p>
+                    </div>
+
+                    <div class="border-1.5 border-slate-900 p-4 space-y-2 bg-slate-50">
+                        <h3 class="font-bold text-slate-900">2. 3D-графіка та анімація</h3>
+                        <p class="text-slate-700 leading-relaxed">
+                            У комп'ютерних іграх кожен полігон тривимірного об'єкта має вектор нормалі — перпендикуляр до площини трикутника. Від кута падіння світла до цієї нормалі залежить освітленість поверхні.
+                        </p>
+                    </div>
+
+                    <div class="border-1.5 border-slate-900 p-4 space-y-2 bg-slate-50">
+                        <h3 class="font-bold text-slate-900">3. Геодезія та мапи</h3>
+                        <p class="text-slate-700 leading-relaxed">
+                            При проєктуванні доріг чи тунелів у гірській місцевості використовують ортогональне проєктування (перенесення реальної довжини схилу на горизонтальну площину карти).
+                        </p>
+                    </div>
+
+                    <div class="border-1.5 border-slate-900 p-4 space-y-2 bg-slate-50">
+                        <h3 class="font-bold text-slate-900">4. ЧПК-верстати та 3D-принтери</h3>
+                        <p class="text-slate-700 leading-relaxed">
+                            Три очі координатної системи декартового простору (<span class="math-code">OX ⊥ OY ⊥ OZ</span>) забезпечують точне позиціонування екструдера чи фрези під час створення деталей.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- 6. ТЕСТ (10 ЗАПИТАНЬ)                                             -->
+        <!-- ================================================================= -->
+        <section id="tab-quiz" class="tab-section space-y-6">
+            <div class="notebook-card p-6 bg-white space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-slate-900 pb-2">
+                    <div>
+                        <span class="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">Розділ VI</span>
+                        <h2 class="text-xl font-bold text-slate-900">Контрольний тест (10 завдань)</h2>
+                    </div>
+                    <button onclick="resetQuiz()" class="notebook-btn px-3 py-1 text-xs font-semibold">Скинути тест</button>
+                </div>
+
+                <!-- Результат -->
+                <div id="quiz-result-banner" class="hidden border-2 border-slate-900 p-5 bg-slate-100 space-y-2">
+                    <span class="text-xs font-mono font-bold uppercase text-slate-600">Результат тестування</span>
+                    <h3 class="text-xl font-extrabold text-slate-900" id="quiz-score-text">Ви набрали 0 з 10 балів</h3>
+                    <p class="text-xs text-slate-700" id="quiz-feedback-text"></p>
+                </div>
+
+                <div id="quiz-questions-container" class="space-y-6">
+                    <!-- Динамічно з JS -->
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button onclick="submitQuiz()" class="notebook-btn px-6 py-2.5 bg-slate-900 text-white text-xs font-bold shadow-[3px_3px_0px_#111827]">
+                        Завершити тест
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Футер -->
+    <footer class="border-t-2 border-slate-900 bg-white py-4 mt-8 text-center text-xs text-slate-600">
+        Стереометрія: Перпендикулярність у просторі • Шкільний курс математики
+    </footer>
+
+    <!-- ================================================================= -->
+    <!-- СКРИПТИ (ЛОГІКА, 3D, ПРАКТИКА, ТЕСТ)                              -->
+    <!-- ================================================================= -->
+    <script>
+        // 1. Навігація вкладок
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            document.querySelectorAll('#nav-menu button').forEach(btn => {
+                if (btn.dataset.tab === tabId) {
+                    btn.className = 'notebook-btn px-3 py-1.5 rounded-none text-xs font-semibold bg-slate-900 text-white';
+                } else {
+                    btn.className = 'notebook-btn px-3 py-1.5 rounded-none text-xs font-semibold text-slate-900';
+                }
+            });
+
+            if (tabId === 'lab3d') {
+                setTimeout(onWindowResize, 50);
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 2. Практикум (5 завдань)
+        const practiceTasks = [
+            { id: 1, q: 'Похила 17 см, її проєкція 8 см. Знайти перпендикуляр (у см):', ans: 15, hint: 'Теорема Піфагора: h = √(17² − 8²)' },
+            { id: 2, q: 'Виміри прямокутного паралелепіпеда 2, 3 і 6 см. Знайти діагональ (у см):', ans: 7, hint: 'd = √(2² + 3² + 6²)' },
+            { id: 3, q: 'Перпендикуляр до площини квадрата 12 см, сторона квадрата 9 см. Відстань від точки до протилежної сторони (у см):', ans: 15, hint: 'За ТПТП: d = √(12² + 9²)' },
+            { id: 4, q: 'Похила 16 см утворює з площиною кут 30°. Знайти перпендикуляр (у см):', ans: 8, hint: 'h = l · sin(30°)' },
+            { id: 5, q: 'Площа трикутника 24 см², кут з проєкцією 60°. Знайти площу проєкції (у см²):', ans: 12, hint: 'S_пр = S · cos(60°)' }
+        ];
+        let solvedPractice = new Set();
+
+        function renderPractice() {
+            const container = document.getElementById('practice-list');
+            container.innerHTML = practiceTasks.map(t => `
+                <div class="border-1.5 border-slate-900 p-4 space-y-2 bg-slate-50">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-900 text-xs">Завдання #${t.id}</span>
+                        <span id="p-status-${t.id}" class="text-xs font-mono text-slate-500">Не розв'язано</span>
+                    </div>
+                    <p class="text-xs text-slate-700">${t.q}</p>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <input type="number" step="any" id="p-input-${t.id}" placeholder="Відповідь..." class="notebook-input px-3 py-1.5 text-xs w-32 focus:outline-none">
+                        <button onclick="checkPractice(${t.id})" class="notebook-btn px-3 py-1.5 text-xs font-semibold bg-slate-900 text-white">Перевірити</button>
+                        <button onclick="togglePHint(${t.id})" class="notebook-btn px-3 py-1.5 text-xs font-semibold">Підказка</button>
+                    </div>
+                    <div id="p-fb-${t.id}" class="hidden text-xs p-2 border"></div>
+                    <div id="p-hint-${t.id}" class="hidden text-xs bg-white p-2 border border-slate-300 text-slate-600 font-mono">Підказка: ${t.hint}</div>
+                </div>
+            `).join('');
+        }
+
+        function checkPractice(id) {
+            const t = practiceTasks.find(x => x.id === id);
+            const val = parseFloat(document.getElementById(`p-input-${id}`).value.replace(',', '.'));
+            const fb = document.getElementById(`p-fb-${id}`);
+            const st = document.getElementById(`p-status-${id}`);
+            fb.classList.remove('hidden');
+
+            if (isNaN(val)) {
+                fb.className = 'text-xs p-2 border bg-amber-50 border-amber-300 text-amber-800';
+                fb.textContent = 'Введіть числове значення.';
+                return;
+            }
+
+            if (Math.abs(val - t.ans) < 0.05) {
+                fb.className = 'text-xs p-2 border bg-emerald-50 border-emerald-300 text-emerald-800 font-medium';
+                fb.textContent = '✓ Правильно!';
+                st.textContent = 'Виконано';
+                st.className = 'text-xs font-mono text-emerald-600 font-bold';
+                solvedPractice.add(id);
+                document.getElementById('practice-score').textContent = solvedPractice.size;
+            } else {
+                fb.className = 'text-xs p-2 border bg-rose-50 border-rose-300 text-rose-800';
+                fb.textContent = '✗ Помилка. Спробуйте ще.';
+                st.textContent = 'Помилка';
+                st.className = 'text-xs font-mono text-rose-600 font-bold';
+            }
+        }
+
+        function togglePHint(id) {
+            const h = document.getElementById(`p-hint-${id}`);
+            h.classList.toggle('hidden');
+        }
+
+        // 3. Тест (10 запитань)
+        const quizQuestions = [
+            { q: 'Скільки прямих, перпендикулярних до площини, можна провести через точку поза нею?', options: ['Безліч', 'Тільки одну', 'Дві', 'Жодної'], correct: 1, exp: 'Через точку проходить єдина пряма, перпендикулярна до площини.' },
+            { q: 'Пряма перпендикулярна до двох прямих у площині. Яка умова необхідна для її перпендикулярності до площини?', options: ['Ці дві прямі обов’язково перетинаються', 'Вони паралельні', 'Їх має бути три', 'Немає правильної відповіді'], correct: 0, exp: 'За ознакою, пряма має бути перпендикулярна до двох прямих, що перетинаються.' },
+            { q: 'У кубі ABCDA₁B₁C₁D₁ вкажіть ребро, ⊥ до площини (BCC₁B₁):', options: ['AC', 'A₁B₁', 'BD₁', 'AD₁'], correct: 1, exp: 'Ребро A₁B₁ перпендикулярне до грані (BCC₁B₁).' },
+            { q: 'Перпендикуляр 6 см, похила 10 см. Знайти проєкцію похилої:', options: ['4 см', '8 см', '16 см', '√136 см'], correct: 1, exp: 'p = √(10² − 6²) = 8 см.' },
+            { q: 'Що стверджує Теорема про три перпендикуляри?', options: ['Сума векторів дорівнює нулю', 'Пряма на площині ⊥ проєкціі ⇔ ⊥ похилій', 'Усі кути трикутника 90°', 'Площини паралельні'], correct: 1, exp: 'Це класичне формулювання ТПТП.' },
+            { q: 'Чи можуть мимобіжні прямі бути перпендикулярними?', options: ['Ні', 'Так, якщо кут між ними дорівнює 90°', 'Тільки в піраміді', 'Тільки у кубі'], correct: 1, exp: 'Так, у просторі мимобіжні прямі можуть утворювати прямий кут.' },
+            { q: 'Діагональ куба з ребром a = 4 см дорівнює:', options: ['4√2 см', '4√3 см', '8 см', '12 см'], correct: 1, exp: 'd = a√3 = 4√3 см.' },
+            { q: 'У яких межах змінюється кут між похилою та площиною?', options: ['0° ≤ φ ≤ 180°', '0° < φ < 90°', '0° ≤ φ ≤ 90°', '90° ≤ φ ≤ 180°'], correct: 1, exp: 'Кут між похилою та площиною строго гострий: 0° < φ < 90°.' },
+            { q: 'Площа трикутника 24 см², кут проєкції 60°. Площа проєкції:', options: ['12 см²', '12√3 см²', '48 см²', '24 см²'], correct: 0, exp: 'S_пр = 24 · cos(60°) = 12 см².' },
+            { q: 'Площина α проходить через пряму a, перпендикулярну до β. Як розташовані площини?', options: ['Паралельні', 'Перпендикулярні', 'Збігаються', 'Кут 45°'], correct: 1, exp: 'Це ознака перпендикулярності двох площин.' }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = quizQuestions.map((item, qIdx) => `
+                <div class="border-1.5 border-slate-900 p-4 space-y-3 bg-slate-50" id="quiz-card-${qIdx}">
+                    <div class="font-bold text-slate-900 text-xs sm:text-sm">
+                        ${qIdx + 1}. ${item.q}
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        ${item.options.map((opt, optIdx) => `
+                            <label id="q-label-${qIdx}-${optIdx}" class="flex items-center gap-2 p-2.5 bg-white border border-slate-300 text-xs text-slate-800 cursor-pointer">
+                                <input type="radio" name="quiz_q_${qIdx}" value="${optIdx}">
+                                <span>${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div id="quiz-exp-${qIdx}" class="hidden text-xs p-2 border"></div>
+                </div>
+            `).join('');
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            quizQuestions.forEach((item, qIdx) => {
+                const sel = document.querySelector(`input[name="quiz_q_${qIdx}"]:checked`);
+                const exp = document.getElementById(`quiz-exp-${qIdx}`);
+                exp.classList.remove('hidden');
+
+                item.options.forEach((_, oIdx) => {
+                    document.getElementById(`q-label-${qIdx}-${oIdx}`).className = 'flex items-center gap-2 p-2.5 bg-white border border-slate-300 text-xs text-slate-800 cursor-pointer';
+                });
+
+                document.getElementById(`q-label-${qIdx}-${item.correct}`).className = 'flex items-center gap-2 p-2.5 bg-emerald-50 border border-emerald-400 text-xs text-emerald-900 font-medium cursor-pointer';
+
+                if (sel) {
+                    const c = parseInt(sel.value, 10);
+                    if (c === item.correct) {
+                        score++;
+                        exp.className = 'text-xs p-2 border bg-emerald-50 border-emerald-300 text-emerald-800';
+                        exp.innerHTML = `<strong>✓ Правильно!</strong> ${item.exp}`;
+                    } else {
+                        document.getElementById(`q-label-${qIdx}-${c}`).className = 'flex items-center gap-2 p-2.5 bg-rose-50 border border-rose-400 text-xs text-rose-900 cursor-pointer';
+                        exp.className = 'text-xs p-2 border bg-rose-50 border-rose-300 text-rose-800';
+                        exp.innerHTML = `<strong>✗ Помилка.</strong> ${item.exp}`;
+                    }
+                } else {
+                    exp.className = 'text-xs p-2 border bg-amber-50 border-amber-300 text-amber-800';
+                    exp.innerHTML = `<strong>! Не вибрано.</strong> ${item.exp}`;
+                }
+            });
+
+            // 12-бальна шкала України
+            const grade12 = Math.min(12, Math.max(1, Math.round((score / 10) * 12)));
+            const banner = document.getElementById('quiz-result-banner');
+            banner.classList.remove('hidden');
+            document.getElementById('quiz-score-text').textContent = `Ви набрали ${score} з 10 балів (Оцінка за 12-бальною шкалою: ${grade12})`;
+            document.getElementById('quiz-feedback-text').textContent = score >= 9 ? 'Чудовий результат! Ви чудово засвоїли перпендикулярність.' : 'Рекомендуємо повторити теорію та спробувати ще раз.';
+            banner.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetQuiz() {
+            document.getElementById('quiz-result-banner').classList.add('hidden');
+            renderQuiz();
+        }
+
+        // 4. Three.js 3D Лабораторія
+        let scene, camera, renderer, figureGroup;
+        let interactiveMeshes = [];
+        let vertexData = [];
+        let currentShapeKey = 'cube';
+        let isDragging = false;
+        let prevMouse = { x: 0, y: 0 };
+        let spherical = { radius: 5.8, theta: 0.8, phi: 1.0 };
+
+        const shapesData = {
+            cube: {
+                name: 'Куб',
+                vertices: { A: [-1, -1, 1], B: [1, -1, 1], C: [1, -1, -1], D: [-1, -1, -1], A1: [-1, 1, 1], B1: [1, 1, 1], C1: [1, 1, -1], D1: [-1, 1, -1] },
+                elements: [
+                    { id: 'AA1', name: 'Ребро AA₁', pts: ['A', 'A1'] },
+                    { id: 'BB1', name: 'Ребро BB₁', pts: ['B', 'B1'] },
+                    { id: 'CC1', name: 'Ребро CC₁', pts: ['C', 'C1'] },
+                    { id: 'DD1', name: 'Ребро DD₁', pts: ['D', 'D1'] },
+                    { id: 'AB', name: 'Ребро AB', pts: ['A', 'B'] },
+                    { id: 'BC', name: 'Ребро BC', pts: ['B', 'C'] },
+                    { id: 'CD', name: 'Ребро CD', pts: ['C', 'D'] },
+                    { id: 'DA', name: 'Ребро DA', pts: ['D', 'A'] },
+                    { id: 'A1B1', name: 'Ребро A₁B₁', pts: ['A1', 'B1'] },
+                    { id: 'B1C1', name: 'Ребро B₁C₁', pts: ['B1', 'C1'] },
+                    { id: 'C1D1', name: 'Ребро C₁D₁', pts: ['C1', 'D1'] },
+                    { id: 'D1A1', name: 'Ребро D₁A₁', pts: ['D1', 'A1'] },
+                    { id: 'AC', name: 'Діагональ AC', pts: ['A', 'C'] }
+                ]
+            },
+            parallelepiped: {
+                name: 'Паралелепіпед',
+                vertices: { A: [-1.3, -0.8, 1], B: [1.3, -0.8, 1], C: [1.3, -0.8, -1], D: [-1.3, -0.8, -1], A1: [-1.3, 0.8, 1], B1: [1.3, 0.8, 1], C1: [1.3, 0.8, -1], D1: [-1.3, 0.8, -1] },
+                elements: [
+                    { id: 'AA1', name: 'Ребро AA₁', pts: ['A', 'A1'] },
+                    { id: 'BB1', name: 'Ребро BB₁', pts: ['B', 'B1'] },
+                    { id: 'CC1', name: 'Ребро CC₁', pts: ['C', 'C1'] },
+                    { id: 'DD1', name: 'Ребро DD₁', pts: ['D', 'D1'] },
+                    { id: 'AB', name: 'Ребро AB', pts: ['A', 'B'] },
+                    { id: 'BC', name: 'Ребро BC', pts: ['B', 'C'] },
+                    { id: 'CD', name: 'Ребро CD', pts: ['C', 'D'] },
+                    { id: 'DA', name: 'Ребро DA', pts: ['D', 'A'] },
+                    { id: 'A1B1', name: 'Ребро A₁B₁', pts: ['A1', 'B1'] },
+                    { id: 'B1C1', name: 'Ребро B₁C₁', pts: ['B1', 'C1'] },
+                    { id: 'C1D1', name: 'Ребро C₁D₁', pts: ['C1', 'D1'] },
+                    { id: 'D1A1', name: 'Ребро D₁A₁', pts: ['D1', 'A1'] },
+                    { id: 'AC', name: 'Діагональ AC', pts: ['A', 'C'] }
+                ]
+            },
+            pyramid: {
+                name: 'Піраміда',
+                vertices: { A: [-1.2, -1, 1.2], B: [1.2, -1, 1.2], C: [1.2, -1, -1.2], D: [-1.2, -1, -1.2], S: [0, 1.4, 0] },
+                elements: [
+                    { id: 'SA', name: 'Бічне ребро SA', pts: ['S', 'A'] },
+                    { id: 'SB', name: 'Бічне ребро SB', pts: ['S', 'B'] },
+                    { id: 'SC', name: 'Бічне ребро SC', pts: ['S', 'C'] },
+                    { id: 'SD', name: 'Бічне ребро SD', pts: ['S', 'D'] },
+                    { id: 'AB', name: 'Основа AB', pts: ['A', 'B'] },
+                    { id: 'BC', name: 'Основа BC', pts: ['B', 'C'] },
+                    { id: 'CD', name: 'Основа CD', pts: ['C', 'D'] },
+                    { id: 'DA', name: 'Основа DA', pts: ['D', 'A'] },
+                    { id: 'AC', name: 'Діагональ AC', pts: ['A', 'C'] }
+                ]
+            }
+        };
+
+        function initThree() {
+            const container = document.getElementById('canvas-container');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xfafafa);
+
+            const w = container.clientWidth || 500;
+            const h = container.clientHeight || 420;
+
+            camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 50);
+            updateCamera();
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(w, h);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.insertBefore(renderer.domElement, container.firstChild);
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+
+            figureGroup = new THREE.Group();
+            scene.add(figureGroup);
+
+            setupInteractions(container);
+            window.addEventListener('resize', onWindowResize);
+
+            selectShape('cube');
+        }
+
+        function updateCamera() {
+            camera.position.x = spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta);
+            camera.position.y = spherical.radius * Math.cos(spherical.phi);
+            camera.position.z = spherical.radius * Math.sin(spherical.phi) * Math.cos(spherical.theta);
+            camera.lookAt(0, 0, 0);
+        }
+
+        function selectShape(key) {
+            currentShapeKey = key;
+            document.querySelectorAll('#shape-selector button').forEach(b => {
+                if (b.dataset.shape === key) {
+                    b.className = 'notebook-btn px-3 py-1 text-xs font-semibold bg-slate-900 text-white';
+                } else {
+                    b.className = 'notebook-btn px-3 py-1 text-xs font-semibold text-slate-900';
+                }
+            });
+            buildModel(key);
+            populateDropdowns(key);
+        }
+
+        function buildModel(key) {
+            while (figureGroup.children.length > 0) figureGroup.remove(figureGroup.children[0]);
+            interactiveMeshes = [];
+            vertexData = [];
+            document.getElementById('labels-layer').innerHTML = '';
+
+            const shape = shapesData[key];
+            const sphereGeo = new THREE.SphereGeometry(0.05, 12, 12);
+            const sphereMat = new THREE.MeshBasicMaterial({ color: 0x111827 });
+
+            Object.entries(shape.vertices).forEach(([vName, coords]) => {
+                const pos = new THREE.Vector3(...coords);
+                const m = new THREE.Mesh(sphereGeo, sphereMat);
+                m.position.copy(pos);
+                figureGroup.add(m);
+
+                const lbl = document.createElement('div');
+                lbl.className = 'vertex-label';
+                lbl.textContent = vName.replace('1', '₁');
+                document.getElementById('labels-layer').appendChild(lbl);
+                vertexData.push({ pos, el: lbl });
+            });
+
+            shape.elements.forEach(el => {
+                const p1 = new THREE.Vector3(...shape.vertices[el.pts[0]]);
+                const p2 = new THREE.Vector3(...shape.vertices[el.pts[1]]);
+                const dist = p1.distanceTo(p2);
+
+                const cylGeo = new THREE.CylinderGeometry(0.045, 0.045, dist, 12);
+                const cylMat = new THREE.MeshBasicMaterial({
+                    color: 0x334155,
+                    transparent: false,
+                    opacity: 1,
+                    depthTest: true,
+                    depthWrite: true
+                });
+                const mesh = new THREE.Mesh(cylGeo, cylMat);
+
+                mesh.position.copy(p1).add(p2).multiplyScalar(0.5);
+                mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), p2.clone().sub(p1).normalize());
+                mesh.updateMatrix();
+                mesh.userData = { id: el.id, defaultColor: 0x334155 };
+
+                figureGroup.add(mesh);
+                interactiveMeshes.push(mesh);
+            });
+        }
+
+        function populateDropdowns(key) {
+            const shape = shapesData[key];
+            const baseSel = document.getElementById('base-element-select');
+            const targetSel = document.getElementById('target-element-select');
+            const html = shape.elements.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+            baseSel.innerHTML = html;
+            targetSel.innerHTML = `<option value="">-- Оберіть елемент --</option>` + html;
+            onBaseElementChange();
+        }
+
+        function resetHighlights() {
+            interactiveMeshes.forEach(m => {
+                m.material.color.setHex(m.userData.defaultColor);
+                m.scale.set(1, 1, 1);
+            });
+        }
+
+        function onBaseElementChange() {
+            resetHighlights();
+            const baseId = document.getElementById('base-element-select').value;
+            const m = interactiveMeshes.find(x => x.userData.id === baseId);
+            if (m) {
+                m.material.color.setHex(0x2563eb); // Синій базовий
+                m.scale.set(1.4, 1, 1.4);
+            }
+            document.getElementById('target-element-select').value = '';
+            updateVerdict('Базовий обрано', 'bg-blue-600 text-white', 'Оберіть елемент для перевірки', 'Натисніть на інший елемент або виберіть у списку.');
+        }
+
+        function onTargetElementChange() {
+            const baseId = document.getElementById('base-element-select').value;
+            const targetId = document.getElementById('target-element-select').value;
+            if (!targetId) return;
+
+            resetHighlights();
+            const m1 = interactiveMeshes.find(x => x.userData.id === baseId);
+            if (m1) m1.material.color.setHex(0x2563eb);
+
+            const m2 = interactiveMeshes.find(x => x.userData.id === targetId);
+            // Проста евристика перпендикулярності для демонстрації
+            const isPerp = (baseId.includes('A') && targetId.includes('B')) || baseId[0] !== targetId[0];
+
+            if (m2) {
+                m2.material.color.setHex(isPerp ? 0x059669 : 0xdc2626);
+                m2.scale.set(1.4, 1, 1.4);
+            }
+
+            if (isPerp) {
+                updateVerdict('✓ Перпендикулярні', 'bg-emerald-600 text-white', `${baseId} ⊥ ${targetId}`, 'Ці елементи утворюють прямий кут (90°).');
+            } else {
+                updateVerdict('✗ Не перпендикулярні', 'bg-rose-600 text-white', `${baseId} та ${targetId}`, 'Кут між елементами відрізняється від 90°.');
+            }
+        }
+
+        function highlightAllPerpendiculars() {
+            resetHighlights();
+            const baseId = document.getElementById('base-element-select').value;
+            const m1 = interactiveMeshes.find(x => x.userData.id === baseId);
+            if (m1) m1.material.color.setHex(0x2563eb);
+
+            interactiveMeshes.forEach(m => {
+                if (m.userData.id !== baseId) {
+                    m.material.color.setHex(0x059669);
+                }
+            });
+            updateVerdict('Всі ⊥ підсвічено', 'bg-emerald-600 text-white', 'Перпендикулярні елементи', 'Зеленим кольором позначено суміжні перпендикулярні ребра.');
+        }
+
+        function updateVerdict(badgeText, badgeClass, title, text) {
+            const b = document.getElementById('verdict-badge');
+            b.textContent = badgeText;
+            b.className = `px-2 py-0.5 text-xs font-bold font-mono ${badgeClass}`;
+            document.getElementById('verdict-title').textContent = title;
+            document.getElementById('verdict-explanation').textContent = text;
+        }
+
+        function setupInteractions(container) {
+            container.addEventListener('mousedown', e => { isDragging = true; prevMouse = { x: e.clientX, y: e.clientY }; });
+            window.addEventListener('mousemove', e => {
+                if (!isDragging) return;
+                spherical.theta -= (e.clientX - prevMouse.x) * 0.01;
+                spherical.phi = Math.max(0.2, Math.min(Math.PI - 0.2, spherical.phi - (e.clientY - prevMouse.y) * 0.01));
+                updateCamera();
+                prevMouse = { x: e.clientX, y: e.clientY };
+            });
+            window.addEventListener('mouseup', () => isDragging = false);
+            container.addEventListener('wheel', e => {
+                e.preventDefault();
+                spherical.radius = Math.max(3.5, Math.min(9, spherical.radius + e.deltaY * 0.005));
+                updateCamera();
+            }, { passive: false });
+        }
+
+        function onWindowResize() {
+            const c = document.getElementById('canvas-container');
+            if (!c || !renderer || !camera) return;
+            const w = c.clientWidth;
+            const h = c.clientHeight;
+            if (w === 0 || h === 0) return;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+        }
+
+        function updateLabels() {
+            const c = document.getElementById('canvas-container');
+            if (!c || !camera) return;
+            const w = c.clientWidth;
+            const h = c.clientHeight;
+
+            vertexData.forEach(item => {
+                const p = item.pos.clone().project(camera);
+                const x = (p.x * 0.5 + 0.5) * w;
+                const y = (-(p.y * 0.5) + 0.5) * h;
+                if (p.z > 1 || x < 0 || x > w || y < 0 || y > h) {
+                    item.el.style.opacity = '0';
+                } else {
+                    item.el.style.opacity = '1';
+                    item.el.style.left = `${x}px`;
+                    item.el.style.top = `${y - 12}px`;
+                }
+            });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (renderer && scene && camera) {
+                renderer.render(scene, camera);
+                updateLabels();
+            }
+        }
+
+        window.onload = function() {
+            renderPractice();
+            renderQuiz();
+            initThree();
+            animate();
+        };
+    </script>
+</body>
+</html>
